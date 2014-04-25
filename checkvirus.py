@@ -1,10 +1,10 @@
 #!/usr/bin/python -W ignore::DeprecationWarning
 # md5 is deprecated in 2.6 but ok in 2.7
  
-# Filter for using TotalVirus (TV) as a ProcMail-Filter
+# Filter for using VirusTotal VT as a ProcMail-Filter
 # (C)2014 Emil Obermayr u@bnm.me
 
-# Makes use of the API demo of TV
+# Makes use of the API demo of VT
 # https://www.virustotal.com/
 
 # My code-blog
@@ -55,13 +55,13 @@ def toCheck (mimetype, filename) :
 # code starts here
 #
 
-# enter your TotalVirus (TV) API-key here
-apikey = "1e296686973d6569b26af963557c4b9828086eba17c889ebf5e41011e7acc322"
+# enter your VT API-key here
+apikey = ""
 
 debug = False												# debugging switches off the remote checks
 
 mailstring = "" 											# collects the Mail as a String
-url = "https://www.virustotal.com/vtapi/v2/file/report"	# URL to the TV-API
+url = "https://www.virustotal.com/vtapi/v2/file/report"	# URL to the VT-API
 result = False												# defaults to a "negative"
 resultStringLong = ""									# initialize String for verbose results
 
