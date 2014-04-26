@@ -10,7 +10,7 @@
 # My code-blog
 # https://plus.google.com/b/108361876263602371830/108361876263602371830/posts
 
-import fileinput
+#import fileinput
 import email
 import md5
 import json
@@ -18,6 +18,7 @@ import urllib
 import urllib2
 import sys
 import os
+import ConfigParser
 
 ### function "toCheck"
 # check whether we should check the MIME-part
@@ -54,11 +55,11 @@ def toCheck (mimetype, filename) :
 ###
 # code starts here
 #
-
-# enter your VT API-key here
-apikey = ""
-
-debug = False												# debugging switches off the remote checks
+dir = os.path.dirname (os.path.realpath(__file__))
+config = ConfigParser.ConfigParser()
+config.readfp(open(dir + '/checkvirus.cfg'))
+apikey = config.get("main", 'apikey')				# VT-key to use; get it from your personal VT-page
+debug = config.getboolean('main', 'debug')		# debugging switches off the remote checks
 
 mailstring = "" 											# collects the Mail as a String
 url = "https://www.virustotal.com/vtapi/v2/file/report"	# URL to the VT-API
