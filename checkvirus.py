@@ -24,31 +24,47 @@ import ConfigParser
 # check whether we should check the MIME-part
 #
 def toCheck (mimetype, filename) :
+	global forceQuarantine
 	checkit = True		# default: yes
 	
 	basename, ext = os.path.splitext(filename)	# split the suffix 
 	fileext = ext.lower()								# make it lower-case for easy comparison
 	
+	if debug :
+		print mimetype 
+		print fileext
+	
 	if mimetype == "text/plain" :						# do not check simple text or HTML
 		checkit = False 
+
+        if mimetype == "application/pkcs7-signature" :                          # do not check simple text or HTML
+                checkit = False
+
+	if mimetype == "message/rfc822" :
+                checkit = False
 
 	if mimetype == "text/html" :						
 		checkit = False 
 		
 	if fileext == ".exe" :								# do check if suffix is "scary"
 		checkit = True	
+		forceQuarantine = True
 
 	if fileext == ".zip" :
 		checkit = True	
+                forceQuarantine = True
 
 	if fileext == ".scr" :
 		checkit = True	
+                forceQuarantine = True
 
 	if fileext == ".com" :
 		checkit = True	
+                forceQuarantine = True
 
 	if fileext == ".pif" :
 		checkit = True	
+                forceQuarantine = True
 	
 	return checkit
 
@@ -71,6 +87,8 @@ mailString = "".join(sys.stdin.readlines())		# get Mail as String vom Standard-I
 msg = email.message_from_string (mailString)		# create the Email-Object
 
 mailString = None											# forget the Email as String to save memory
+quarantine = False
+forceQuarantine = False
 
 for part in msg.walk() :								# iterate through all the MIME-parts
 	pl = part.get_payload(decode=True)				# get the "body" of the MIME-part, use the decoding of base64 and such
@@ -104,12 +122,15 @@ for part in msg.walk() :								# iterate through all the MIME-parts
 					if answer["positives"] != 0 :		# if there is any positive
 						result = True						# set the result to malware
 						resultStringLong += "# " + str(pos) + "/" + str(tot) + " "		# result 'en detail'
+					else :
+                                                resultStringLong += "# seems clean "	
 						
 				else :
 					resultStringLong += "# untested "	# no result, most likely that means: not a virus
 	
 			else :
 				resultStringLong += "# no response "	# no response means nothing
+				quarantine = True
 		else :
 			resultStringLong += "# not checked "	# "harmless" stuff not sent to VT 
 if result :
@@ -117,8 +138,11 @@ if result :
 
 else :
 	resultString = "none found"						# result for "looks good so far"
+
+	if quarantine or forceQuarantine :
+		msg["X-Virus-Quarantine"] = "untested content"
 				
 msg["X-Virus-Flag"] = resultString					# set the short result, mainly used for procmail-filtering
 msg["X-Virus-String"] = resultStringLong			# set long result
 
-print msg.as_string()									# write changed message out
+print msg.as_string(True)									# write changed message out
