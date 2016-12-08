@@ -16,6 +16,8 @@ It adds some header-fields that can be used for following ProcMail-filtering
     * **no response** most likely because the API was overloaded
     * **not checked** harmless MIME-Types like _text/plain_ are skipped
     * **`<positives>`/`<total>`** number of reported positives and total number of scanners
+  * Mailheader **X-Virus-Quarantine** 
+    * **untested content** either no response or "scary" file-extension
 
 # Setup #
 
